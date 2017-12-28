@@ -67,7 +67,7 @@ The easy solution is to `import mujoco_py` _before_ `import glfw`.
         Builder = MacExtensionBuilder
     elif sys.platform == 'linux':
         if get_nvidia_lib_dir() is not None and os.getenv('MUJOCO_PY_FORCE_CPU') is None:
-            Builder = LinuxGPUExtensionBuilder
+            Builder = LinuxCPUExtensionBuilder
         else:
             Builder = LinuxCPUExtensionBuilder
     elif sys.platform.startswith("win"):
@@ -291,28 +291,28 @@ class LinuxCPUExtensionBuilder(LinuxExtensionBuilder):
         super().__init__(mjpro_path)
 
         self.extension.sources.append(
-            join(self.CYMJ_DIR_PATH, "gl", "osmesashim.c"))
-        self.extension.libraries.extend(['glewosmesa', 'OSMesa', 'GL'])
+            join(self.CYMJ_DIR_PATH, "gl", "dummyshim.c"))
+        self.extension.libraries.extend(['glfw.3', 'GL', 'glew'])
         self.extension.runtime_library_dirs = [join(mjpro_path, 'bin')]
 
 
-class LinuxGPUExtensionBuilder(LinuxExtensionBuilder):
-
-    def __init__(self, mjpro_path):
-        super().__init__(mjpro_path)
-
-        self.extension.sources.append(self.CYMJ_DIR_PATH + "/gl/eglshim.c")
-        self.extension.include_dirs.append(self.CYMJ_DIR_PATH + '/vendor/egl')
-        self.extension.libraries.extend(['glewegl'])
-        self.extension.runtime_library_dirs = [join(mjpro_path, 'bin')]
-
-    def _build_impl(self):
-        so_file_path = super()._build_impl()
-        fix_shared_library(so_file_path, 'libOpenGL.so',
-                           join(get_nvidia_lib_dir(), 'libOpenGL.so.0'))
-        fix_shared_library(so_file_path, 'libEGL.so',
-                           join(get_nvidia_lib_dir(), 'libEGL.so.1'))
-        return so_file_path
+#class LinuxGPUExtensionBuilder(LinuxExtensionBuilder):
+#
+#    def __init__(self, mjpro_path):
+#        super().__init__(mjpro_path)
+#
+#        self.extension.sources.append(self.CYMJ_DIR_PATH + "/gl/eglshim.c")
+#        self.extension.include_dirs.append(self.CYMJ_DIR_PATH + '/vendor/egl')
+#        self.extension.libraries.extend(['glewegl'])
+#        self.extension.runtime_library_dirs = [join(mjpro_path, 'bin')]
+#
+#    def _build_impl(self):
+#        so_file_path = super()._build_impl()
+#        fix_shared_library(so_file_path, 'libOpenGL.so',
+#                           join(get_nvidia_lib_dir(), 'libOpenGL.so.0'))
+#        fix_shared_library(so_file_path, 'libEGL.so',
+#                           join(get_nvidia_lib_dir(), 'libEGL.so.1'))
+#        return so_file_path
 
 
 class MacExtensionBuilder(MujocoExtensionBuilder):

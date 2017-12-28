@@ -88,15 +88,16 @@ cdef class MjRenderContext(object):
         self.con = WrapMjrContext(&self._con)
 
     def _setup_opengl_context(self, offscreen, device_id):
-        if not offscreen or sys.platform == 'darwin':
-            self.opengl_context = GlfwContext(offscreen=offscreen)
-        else:
-            if device_id < 0:
-                if "GPUS" in os.environ:
-                    device_id = int(os.environ["GPUS"].split(',')[0])
-                else:
-                    device_id = int(os.getenv('CUDA_VISIBLE_DEVICES', '0').split(',')[0])
-            self.opengl_context = OffscreenOpenGLContext(device_id)
+        self.opengl_context = GlfwContext(offscreen=offscreen)
+        #if not offscreen or sys.platform == 'darwin':
+        #    self.opengl_context = GlfwContext(offscreen=offscreen)
+        #else:
+        #    if device_id < 0:
+        #        if "GPUS" in os.environ:
+        #            device_id = int(os.environ["GPUS"].split(',')[0])
+        #        else:
+        #            device_id = int(os.getenv('CUDA_VISIBLE_DEVICES', '0').split(',')[0])
+        #    self.opengl_context = OffscreenOpenGLContext(device_id)
 
     def _init_camera(self, sim):
         # Make the free camera look at the scene
